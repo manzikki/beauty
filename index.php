@@ -48,11 +48,21 @@
 
 function bookings_page() {
     require('connect.php');
+    $result = $conn->query("select ArtistName, CustomerName, Date, Timeofday from Artist, Booking, Customer where Booking.ArtistID = Artist.ArtistID and Booking.CustomerID = Customer.CustomerID");
     //get customer list by SQL here
     //make table prettier by CSS
     echo "<h3>Bookings</h3> <div class='container'> <table class='table table-bordered'>";
     echo "<tr><th>Customer</th> <th>Artist</th> <th>Date</th> <th>Time</th></tr>";
+    while ($row = $result->fetch_assoc()) {
+       echo "<tr>";
+       echo "<td>".$row["CustomerName"]."</td>";
+       echo "<td>".$row["ArtistName"]."</td>";
+       echo "<td>".$row["Date"]."</td>";
+       echo "<td>".$row["Timeofday"]."</td>";
+       echo "</tr>";
+    }
     echo '</table></div>';
+
     $conn->close();
 
     echo "<h3>Add new</h3>";
