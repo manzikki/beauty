@@ -106,7 +106,7 @@ function artists_page()
           </tr>
 
           <tr>
-      <td>Rate: </td><td> <input type='text' name='HourlyRate' required='true'></td>
+      <td>Rate: </td><td> <input type='number' name='HourlyRate' required='true'></td>
           </tr>
 
     <td colspan='2'><button type='submit'> Add new </button></td>
@@ -117,7 +117,25 @@ function artists_page()
 
 function add_artist()
 {
-    echo "Sorry, not yet implemented!";
+    require('connect.php');
+    //find the id max value
+    $result = $conn->query("select max(ArtistID) from Artist");
+    $maxid = 0;
+    while ($row = $result->fetch_array()) { $maxid = $row[0] + 1; }
+    //var_dump($_POST);
+    //get the submitted input
+    $name = $_POST["ArtistName"];
+    $spec = $_POST["SpecialityName"];
+    $rate = $_POST["HourlyRate"];
+    //we cannot trust the input. check.
+    if ( ($name == "") or ($spec == "") or (!is_numeric($rate)) ) { die("Invalid input"); }
+    // see sql-adv slides. We use prepare to prevent SQL injection
+    $stmt = $conn->prepare("insert into Artist values(?,?,?,?)");
+    $bind = $stmt->bind_param("issi", $maxid, $name, $spec, $rate);
+    if (!$bind) { die($stmt->error); }
+    if (!$stmt->execute()) { die($stmt->error); }
+    $conn->close();
+    artists_page(); //go to artists page
 }
 
 function customers_page()
