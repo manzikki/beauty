@@ -63,14 +63,35 @@ function bookings_page() {
     }
     echo '</table></div>';
 
+    //get information about artists and customers to populate drop-downs
+
+    $cust_sel = "<select name='custselect'>";
+    $result = $conn->query("select * from Customer");
+    while ($row = $result->fetch_assoc()) {
+        $cust_sel = $cust_sel."<option value=".$row["CustomerID"].">".$row["CustomerName"]."</option>";
+    }
+    $cust_sel = $cust_sel."</select>";
+
+    $artist_sel = "<select name='artistselect'>";
+    $result = $conn->query("select * from Artist");
+    while ($row = $result->fetch_assoc()) {
+        $artist_sel = $artist_sel."<option value=".$row["ArtistID"].">".$row["ArtistName"]." : ".$row["SpecialityName"]."</option>";
+    }
+    $artist_sel = $artist_sel."</select>";
+
     $conn->close();
+
+    $today = date("Y-m-j");
 
     echo "<h3>Add new</h3>";
     echo
      "<form action='index.php'  method='post'>
         <input type='hidden' name='page' value='addbooking'/>
         <div class='container'> <table class='table table-bordered'>
-   	  <td colspan='2'><button type='submit'> Add new </button></td>
+        <tr><th>Customer</th> <th>Artist</th> <th>Date</th> <th>Time</th></tr>
+        <tr><td>".$cust_sel."</td><td>".$artist_sel."</td><td><input name='bookingdate' type='date' value=".$today."></input></td>
+            <td><input type='number' name='hour' min='9' max='18' value='9'></input></td></tr>
+   	  <td colspan='4'><button type='submit'> Add new </button></td>
             </tr>
             </table></div>
    </form>";
@@ -138,6 +159,12 @@ function add_artist()
     artists_page(); //go to artists page
 }
 
+function add_booking()
+{
+    echo "Sorry, this functionality not yet implemented, but the POST values are listed below.<br/>";
+    var_dump($_POST);
+}
+
 function customers_page()
 {
     //list existing
@@ -166,6 +193,7 @@ if ($page == "") { bookings_page(); }
 if ($page == "artists") { artists_page(); }
 if ($page == "customers") { customers_page(); }
 if ($page == "addartist") { add_artist(); }
+if ($page == "addbooking") { add_booking(); }
 
 ?>
 
