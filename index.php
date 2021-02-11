@@ -43,7 +43,8 @@
     </nav>
 
 <?php
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 
 function bookings_page() {
@@ -97,6 +98,41 @@ function bookings_page() {
    </form>";
 }
 
+//Demonstration of how to use objects
+class Artist {
+    public $a_id;
+    public $name;
+    public $speciality;
+    public $rate;
+    function __construct($a_id, $name, $spec, $rate) {
+        $this->a_id = $a_id;
+        $this->name = $name;
+        $this->speciality = $spec;
+        $this->rate = $rate;
+    }
+    function store($connection) {
+        //stores the current artist in the database using the connection.
+        //If the artist id is negative, gets an unused artist id from the database.
+        //If it is nonnegative, replaces the existing artist in the database.
+        $myid = $this->a_id;
+        if ($myid < 0) {
+           $result = $connection->query("select max(ArtistID) from Artist");
+           while ($row = $result->fetch_array()) { $myid = $row[0] + 1; }                    
+           //die("XXX".$myid);
+           $stmt = $connection->prepare("insert into Artist values(?,?,?,?)");
+           $bind = $stmt->bind_param("issi", $myid, $this->name, $this->speciality, $this->rate);
+           if (!$bind) { die($stmt->error); }
+           if (!$stmt->execute()) { die($stmt->error); }
+        } else { //untested
+           $stmt = $connection->prepare("update Artist set name=(?), speciality=(?), rate=(?) where ArtistID=(?)");
+           $bind = $stmt->bind_param("ssii", $this->name, $this->speciality, $this->rate, $myid);
+           if (!$bind) { die($stmt->error); }
+           if (!$stmt->execute()) { die($stmt->error); }
+        }
+        $connection->close();
+    }
+}
+
 function artists_page()
 {
     require('connect.php');
@@ -139,23 +175,14 @@ function artists_page()
 function add_artist()
 {
     require('connect.php');
-    //find the id max value
-    $result = $conn->query("select max(ArtistID) from Artist");
-    $maxid = 0;
-    while ($row = $result->fetch_array()) { $maxid = $row[0] + 1; }
-    //var_dump($_POST);
     //get the submitted input
     $name = $_POST["ArtistName"];
     $spec = $_POST["SpecialityName"];
     $rate = $_POST["HourlyRate"];
     //we cannot trust the input. check.
     if ( ($name == "") or ($spec == "") or (!is_numeric($rate)) ) { die("Invalid input"); }
-    // see sql-adv slides. We use prepare to prevent SQL injection
-    $stmt = $conn->prepare("insert into Artist values(?,?,?,?)");
-    $bind = $stmt->bind_param("issi", $maxid, $name, $spec, $rate);
-    if (!$bind) { die($stmt->error); }
-    if (!$stmt->execute()) { die($stmt->error); }
-    $conn->close();
+    $artist = new Artist(-1, $name, $spec, $rate);
+    $artist->store($conn);
     artists_page(); //go to artists page
 }
 
