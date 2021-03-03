@@ -1,4 +1,4 @@
-<!-- Beauty parlor demo application, Marko Niinimaki niinimakim@webster.ac.th, DBApps 2020          -->
+<!-- Beauty parlor demo application, Marko Niinimaki niinimakim@webster.ac.th, DBApps 2020, 2021    -->
 <!-- This file represents the entire application as functions. The default page shows the bookings, -->
 <!-- others: artists, customers. -->
 <html>
@@ -36,7 +36,7 @@
         </ul>
        <ul class="nav justify-content-end">
        <li>
-       <a class="nav-link" href="https://docs.google.com/your-online-docs">Help</a>
+       <a class="nav-link" href="https://github.com/manzikki/beauty/wiki">Help</a>
        </li>
        </ul>
       </div>
