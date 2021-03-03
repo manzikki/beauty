@@ -124,7 +124,7 @@ class Artist {
            if (!$bind) { die($stmt->error); }
            if (!$stmt->execute()) { die($stmt->error); }
         } else { //untested
-           $stmt = $connection->prepare("update Artist set name=(?), speciality=(?), rate=(?) where ArtistID=(?)");
+           $stmt = $connection->prepare("update Artist set name=?, speciality=?, rate=? where ArtistID=?");
            $bind = $stmt->bind_param("ssii", $this->name, $this->speciality, $this->rate, $myid);
            if (!$bind) { die($stmt->error); }
            if (!$stmt->execute()) { die($stmt->error); }
